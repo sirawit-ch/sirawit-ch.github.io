@@ -1,19 +1,34 @@
 # Politigraph Thailand - Next.js Visual Analytics
 
-โปรเจคนี้เป็น Visual Analytics Prototype สำหรับติดตามและวิเคราะห์การทำงานของสมาชิกสภาผู้แทนราษฎร (ส.ส.) ในประเทศไทยสำหรับปี 2025 
+โปรเจคนี้เป็น Visual Analytics Prototype สำหรับติดตามและวิเคราะห์การทำงานของสมาชิกสภาผู้แทนราษฎร (ส.ส.) ในประเทศไทยสำหรับปี 2025
 
-สร้างด้วย **Next.js 15**, **TypeScript**, **Tailwind CSS**, และ **D3.js**
+สร้างด้วย **Next.js 15**, **TypeScript**, **Material-UI (MUI)**, **Tailwind CSS**, และ **D3.js**
+
+## ✨ Features ใหม่
+
+### 📊 Enhanced API Module
+
+- **Real-time Data API** - ดึงข้อมูลสถิติการลงมติของ ส.ส. แบบ real-time
+- **Static Data Generation** - Pre-generate JSON files สำหรับ performance
+- **Type-safe Functions** - ครอบคลุม TypeScript interfaces ทั้งหมด
+- **5+ API Functions** - ดึงข้อมูลแบบ flexible ตามการใช้งาน
+
+📖 **อ่านเพิ่มเติม:** [`docs/API-ENHANCED.md`](docs/API-ENHANCED.md) | [`docs/MIGRATION-SUMMARY.md`](docs/MIGRATION-SUMMARY.md)
 
 ## 🚀 Quick Start
 
 \`\`\`bash
+
 # ติดตั้ง dependencies
+
 npm install
 
 # รัน development server
+
 npm run dev
 
 # เปิด browser: http://localhost:3000
+
 \`\`\`
 
 ## 🛠 Tech Stack
@@ -53,10 +68,10 @@ _รายละเอียดเพิ่มเติมดูใน documenta
 ## 🔧 Development Commands
 
 \`\`\`bash
-npm run dev      # Development server
-npm run build    # Production build
-npm start        # Production server
-npm run lint     # ESLint
+npm run dev # Development server
+npm run build # Production build
+npm start # Production server
+npm run lint # ESLint
 \`\`\`
 
 ## 📝 License

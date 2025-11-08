@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Paper } from "@mui/material";
 import ThailandMap from "@/components/ThailandMap";
 import InfoPanel from "@/components/InfoPanel";
 import FilterPanel from "@/components/FilterPanel";
@@ -22,6 +23,7 @@ export default function Home() {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [selectedMPs, setSelectedMPs] = useState<Politician[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   // Overall statistics
   const [overallStats, setOverallStats] = useState<OverallStatistics | null>(
@@ -41,6 +43,12 @@ export default function Home() {
   );
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     async function loadData() {
       setLoading(true);
       try {
@@ -72,28 +80,46 @@ export default function Home() {
     }
 
     loadData();
-  }, []);
+  }, [mounted]);
 
   const handleProvinceSelected = (province: string, mps: Politician[]) => {
     setSelectedProvince(province);
     setSelectedMPs(mps);
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background: "linear-gradient(135deg, #6DD5ED 0%, #2193B0 100%)",
+        }}
+      >
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">กำลังโหลดข้อมูล...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+          <p className="text-white font-medium">กำลังโหลดข้อมูล...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "linear-gradient(135deg, #6DD5ED 0%, #2193B0 100%)",
+      }}
+    >
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shrink-0">
+      <header
+        className="shrink-0"
+        style={{
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.3)",
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div>
@@ -114,23 +140,43 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-3 flex-1 overflow-hidden">
+      <main className="container mx-auto px-4 py-6 flex-1 overflow-hidden">
         <div className="h-full flex gap-4 overflow-hidden">
           {/* Filter Panel - Left */}
           <div className="w-64 shrink-0 overflow-y-auto">
-            <FilterPanel
-              voteEvents={allVoteEvents}
-              selectedVoteEvent={selectedVoteEvent}
-              onVoteEventChange={setSelectedVoteEvent}
-            />
+            <Paper
+              elevation={3}
+              sx={{
+                background: "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(10px)",
+                borderRadius: "16px",
+              }}
+            >
+              <FilterPanel
+                voteEvents={allVoteEvents}
+                selectedVoteEvent={selectedVoteEvent}
+                onVoteEventChange={setSelectedVoteEvent}
+              />
+            </Paper>
           </div>
 
           {/* Map Section - Center */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col h-full overflow-hidden">
+            <Paper
+              elevation={3}
+              sx={{
+                background: "#E8FBFF",
+                borderRadius: "20px",
+                p: 3,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+              }}
+            >
               <div className="mb-3 shrink-0">
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                  {latestVote?.title || "แผนที่ประเทศไทย"}
+                  {latestVote?.title || "แผนที่การลงมติ"}
                 </h2>
                 {latestVote?.nickname && (
                   <p className="text-sm text-gray-600 mb-2">
@@ -147,35 +193,7 @@ export default function Home() {
                   onProvinceSelected={handleProvinceSelected}
                 />
               </div>
-
-              {/* Legend */}
-              <div className="mt-2 shrink-0">
-                <div className="flex items-center gap-3 text-xs flex-wrap">
-                  <span className="font-medium text-gray-700">Heatmap:</span>
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className="w-3 h-3 rounded"
-                      style={{ backgroundColor: "rgba(34, 197, 94, 0.9)" }}
-                    ></div>
-                    <span>เห็นด้วย (เข้ม = มาลงมติมาก)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className="w-3 h-3 rounded"
-                      style={{ backgroundColor: "rgba(239, 68, 68, 0.9)" }}
-                    ></div>
-                    <span>ไม่เห็นด้วย (เข้ม = มาลงมติมาก)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className="w-3 h-3 rounded"
-                      style={{ backgroundColor: "#e5e7eb" }}
-                    ></div>
-                    <span>ไม่มีข้อมูล</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </Paper>
           </div>
 
           {/* Info Panel - Right */}
