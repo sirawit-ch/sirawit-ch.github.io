@@ -7,6 +7,21 @@
 const GRAPHQL_ENDPOINT = "https://politigraph.wevis.info/graphql";
 
 /**
+ * โหลดข้อมูลจาก static JSON file
+ * ใช้เมื่อ API ล่มหรือไม่ตอบสนอง
+ */
+async function loadStaticData<T>(filename: string): Promise<T | null> {
+  try {
+    const response = await fetch(`/data/${filename}`);
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.warn(`Failed to load static data: ${filename}`, error);
+    return null;
+  }
+}
+
+/**
  * แมพรูปภาพนักการเมืองจากชื่อ
  */
 export function getPoliticianImageUrl(
@@ -84,6 +99,29 @@ export interface OverallStatistics {
  * ดึงข้อมูล ส.ส. ทั้งหมด พร้อมจังหวัด
  */
 export async function fetchPoliticians(): Promise<Politician[]> {
+  // Try loading from static data first
+  const staticData = await loadStaticData<
+    Array<{ person: string; province: string | null; image: string | null }>
+  >("mp-action-summary.json");
+
+  if (staticData && staticData.length > 0) {
+    console.log("Loading politicians from static data");
+    return staticData
+      .filter((mp) => mp.province) // เฉพาะที่มีจังหวัด
+      .map((mp, index) => {
+        const [firstname, lastname] = mp.person.split(" ");
+        return {
+          id: `mp-${index}`,
+          firstname: firstname || mp.person,
+          lastname: lastname || "",
+          province: mp.province || "ไม่ระบุ",
+          prefix: "",
+          imageUrl: mp.image || undefined,
+        };
+      });
+  }
+
+  console.log("Fallback to API for politicians");
   const query = `
     query {
       people(limit: 1000) {

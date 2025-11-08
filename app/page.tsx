@@ -141,7 +141,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 flex-1 overflow-hidden">
-        <div className="h-full flex gap-4 overflow-hidden">
+        <div className=" flex gap-4 overflow-hidden">
           {/* Filter Panel - Left */}
           <div className="w-64 shrink-0 overflow-y-auto">
             <Paper
