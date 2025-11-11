@@ -422,13 +422,13 @@ export default function InfoPanel({
 
                 return (
                   <svg width="150" height="150" viewBox="0 0 150 150">
-                    {/* Used right (green) */}
+                    {/* Used right (purple) */}
                     <circle
                       cx="75"
                       cy="75"
                       r={radius}
                       fill="none"
-                      stroke="#00C758"
+                      stroke="#8B5CF6"
                       strokeWidth="20"
                       strokeDasharray={`${usedLength} ${
                         circumference - usedLength
@@ -458,7 +458,7 @@ export default function InfoPanel({
                       dy=".3em"
                       fontSize="20"
                       fontWeight="bold"
-                      fill="#00C758"
+                      fill="#8B5CF6"
                     >
                       {usedPercent.toFixed(0)}%
                     </text>
@@ -472,7 +472,7 @@ export default function InfoPanel({
                   sx={{
                     width: 12,
                     height: 12,
-                    bgcolor: "#00C758", // สีเขียว
+                    bgcolor: "#8B5CF6", // สีม่วง
                     borderRadius: 1,
                   }}
                 />
