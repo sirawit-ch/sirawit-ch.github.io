@@ -5,15 +5,12 @@ import { Paper } from "@mui/material";
 import ThailandMap from "@/components/ThailandMap";
 import InfoPanel from "@/components/InfoPanel";
 import FilterPanel from "@/components/FilterPanel";
+import type { PersonData, VoteDetailData } from "@/lib/types";
 import {
-  loadPersonData,
-  loadFactData,
-  loadVoteDetailData,
-  groupPersonByProvince,
-  getProvinceVoteStats,
-  getVoteEvents,
-} from "@/lib/new-api";
-import type { PersonData, FactData, VoteDetailData } from "@/lib/types";
+  loadAllData,
+  applyFilters,
+  type ProvinceVoteStats,
+} from "./dataHelpers";
 
 export default function Home() {
   const [people, setPeople] = useState<PersonData[]>([]);
@@ -25,8 +22,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  // Fact data for heatmap and statistics
-  const [factData, setFactData] = useState<FactData[]>([]);
   const [voteDetailData, setVoteDetailData] = useState<VoteDetailData[]>([]);
 
   // Vote events for filter
@@ -43,18 +38,12 @@ export default function Home() {
     VoteDetailData[]
   >([]);
   const [filteredProvinceVoteStats, setFilteredProvinceVoteStats] = useState<
-    Record<
-      string,
-      {
-        province: string;
-        agreeCount: number;
-        disagreeCount: number;
-        abstainCount: number;
-        absentCount: number;
-        total: number;
-      }
-    >
+    Record<string, ProvinceVoteStats>
   >({});
+
+  // Store fact data separately to avoid re-loading
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [factData, setFactData] = useState<any[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -66,29 +55,17 @@ export default function Home() {
     async function loadData() {
       setLoading(true);
       try {
-        // Load all data in parallel
-        const [personData, factDataResult, voteDetailDataResult] =
-          await Promise.all([
-            loadPersonData(),
-            loadFactData(),
-            loadVoteDetailData(),
-          ]);
+        const data = await loadAllData();
 
-        setPeople(personData);
-        setFactData(factDataResult);
-        setVoteDetailData(voteDetailDataResult);
+        setPeople(data.personData);
+        setFactData(data.factData);
+        setVoteDetailData(data.voteDetailData);
+        setGroupedPeople(data.groupedPeople);
+        setAllVoteEvents(data.voteEvents);
 
-        // Group people by province
-        const grouped = groupPersonByProvince(personData, voteDetailDataResult);
-        setGroupedPeople(grouped);
-
-        // Get unique vote events
-        const events = getVoteEvents(factDataResult);
-        setAllVoteEvents(events);
-
-        // Auto-select the latest vote event (last in array)
-        if (events.length > 0) {
-          const latestEvent = events[events.length - 1];
+        // Auto-select the latest vote event
+        if (data.voteEvents.length > 0) {
+          const latestEvent = data.voteEvents[data.voteEvents.length - 1];
           setSelectedVoteEvent(latestEvent);
         }
       } catch (error) {
@@ -103,56 +80,15 @@ export default function Home() {
 
   // Filter data based on selected vote event and option
   useEffect(() => {
-    let filteredDetails = voteDetailData;
-    let filteredFacts = factData;
+    const { filteredVoteDetailData, filteredProvinceVoteStats } = applyFilters(
+      voteDetailData,
+      factData,
+      selectedVoteEvent,
+      selectedVoteOption
+    );
 
-    // Filter by vote event
-    if (selectedVoteEvent) {
-      filteredDetails = filteredDetails.filter(
-        (vote) => vote.title === selectedVoteEvent
-      );
-      filteredFacts = filteredFacts.filter(
-        (fact) => fact.title === selectedVoteEvent
-      );
-    }
-
-    // Filter by vote option
-    if (selectedVoteOption) {
-      // Filter vote details by option
-      filteredDetails = filteredDetails.filter(
-        (vote) => vote.option === selectedVoteOption
-      );
-
-      // Filter facts by both option AND type
-      // type field should match the selected option for specific filtering
-      filteredFacts = filteredFacts.filter(
-        (fact) =>
-          fact.option === selectedVoteOption && fact.type === selectedVoteOption
-      );
-    } else {
-      // When no option selected (ทั้งหมด), use type === "All"
-      filteredFacts = filteredFacts.filter((fact) => fact.type === "All");
-    }
-
-    setFilteredVoteDetailData(filteredDetails);
-
-    // Calculate province stats from filtered fact data
-    const statsMap = getProvinceVoteStats(filteredFacts);
-    const statsRecord: Record<
-      string,
-      {
-        province: string;
-        agreeCount: number;
-        disagreeCount: number;
-        abstainCount: number;
-        absentCount: number;
-        total: number;
-      }
-    > = {};
-    statsMap.forEach((value, key) => {
-      statsRecord[key] = value;
-    });
-    setFilteredProvinceVoteStats(statsRecord);
+    setFilteredVoteDetailData(filteredVoteDetailData);
+    setFilteredProvinceVoteStats(filteredProvinceVoteStats);
   }, [selectedVoteEvent, selectedVoteOption, factData, voteDetailData]);
 
   const handleProvinceSelected = (province: string, mps: PersonData[]) => {
@@ -197,6 +133,7 @@ export default function Home() {
           backdropFilter: "blur(10px)",
           borderBottom: "1px solid rgba(255, 255, 255, 0.3)",
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+          fontFamily: "var(--font-sukhumvit), system-ui, sans-serif",
         }}
       >
         <div className="container mx-auto px-6 py-3">
@@ -222,17 +159,17 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
-        <div className="container mx-auto px-6 py-4 h-full">
-          <div className="h-full flex gap-4">
+        <div className="mx-auto px-8 py-4 h-full max-w-[1800px]">
+          <div className="h-full flex gap-6">
             {/* Filter Panel - Left */}
-            <div className="w-64 shrink-0 h-full overflow-hidden">
+            <div className="w-80 shrink-0 h-full overflow-hidden">
               <Paper
                 elevation={3}
                 sx={{
                   background: "rgba(255, 255, 255, 0.95)",
                   backdropFilter: "blur(10px)",
                   borderRadius: "16px",
-                  height: "100%",
+                  height: "full",
                   overflow: "auto",
                 }}
               >
@@ -261,7 +198,12 @@ export default function Home() {
                   overflow: "hidden",
                 }}
               >
-                <div className="mb-2 shrink-0">
+                <div
+                  className="mb-2 shrink-0"
+                  style={{
+                    fontFamily: "var(--font-sukhumvit), system-ui, sans-serif",
+                  }}
+                >
                   <h2 className="text-lg font-semibold text-gray-900 mb-1">
                     แผนที่การลงมติ
                   </h2>
@@ -294,7 +236,7 @@ export default function Home() {
             </div>
 
             {/* Info Panel - Right */}
-            <div className="w-96 h-full overflow-hidden">
+            <div className="w-[420px] h-full overflow-hidden">
               <InfoPanel
                 key={selectedProvince || "no-province"}
                 province={selectedProvince}

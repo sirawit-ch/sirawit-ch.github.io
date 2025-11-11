@@ -124,7 +124,8 @@ export function groupPersonByProvince(
 
 /**
  * Get province vote statistics from fact data
- * Aggregates all vote events for each province
+ * ใช้ portion จาก fact_data โดยตรง (ไม่รวมค่า)
+ * แต่ละจังหวัด + option มี portion สำเร็จรูปอยู่แล้ว
  */
 export function getProvinceVoteStats(
   factData: FactData[]
@@ -138,25 +139,34 @@ export function getProvinceVoteStats(
         agreeCount: 0,
         disagreeCount: 0,
         abstainCount: 0,
+        noVoteCount: 0,
         absentCount: 0,
         total: 0,
+        portion: 0, // เพิ่ม portion สำหรับเก็บค่าโดยตรง
       });
     }
 
     const stats = statsMap.get(fact.province)!;
 
-    // Map option to counts (using portion as a weight)
+    // เก็บ portion โดยตรงตาม option (ไม่บวกรวม เพราะแต่ละ fact คือ portion ของ option นั้นๆ)
     if (fact.option === "เห็นด้วย") {
-      stats.agreeCount += fact.portion;
+      stats.agreeCount = fact.portion;
     } else if (fact.option === "ไม่เห็นด้วย") {
-      stats.disagreeCount += fact.portion;
+      stats.disagreeCount = fact.portion;
     } else if (fact.option === "งดออกเสียง") {
-      stats.abstainCount += fact.portion;
+      stats.abstainCount = fact.portion;
+    } else if (fact.option === "ไม่ลงคะแนนเสียง") {
+      stats.noVoteCount = fact.portion;
     } else if (fact.option === "ลา / ขาดลงมติ") {
-      stats.absentCount += fact.portion;
+      stats.absentCount = fact.portion;
     }
 
-    stats.total += fact.portion;
+    // สำหรับ type="All" ใช้ portion นี้โดยตรง
+    if (fact.type === "All") {
+      stats.portion = fact.portion;
+    }
+
+    stats.total = 1; // total ไม่จำเป็นต้องใช้แล้วเพราะเรามี portion
   });
 
   return statsMap;

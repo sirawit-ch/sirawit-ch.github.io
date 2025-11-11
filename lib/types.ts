@@ -49,14 +49,18 @@ export interface VoteDetailData {
 
 /**
  * Province-level vote statistics (derived from FactData)
+ * agreeCount, disagreeCount, etc. เก็บ portion (0.0-1.0) โดยตรงจาก fact_data
+ * portion เก็บค่าสำหรับ type="All"
  */
 export interface ProvinceVoteStats {
   province: string;
-  agreeCount: number;
-  disagreeCount: number;
-  abstainCount: number;
-  absentCount: number;
+  agreeCount: number; // portion ของ option="เห็นด้วย"
+  disagreeCount: number; // portion ของ option="ไม่เห็นด้วย"
+  abstainCount: number; // portion ของ option="งดออกเสียง"
+  noVoteCount: number; // portion ของ option="ไม่ลงคะแนนเสียง"
+  absentCount: number; // portion ของ option="ลา / ขาดลงมติ"
   total: number;
+  portion: number; // portion สำหรับ type="All" (ใช้ในกรณีไม่เลือก option)
 }
 
 /**

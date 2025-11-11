@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef, useState } from "react";
 import type { PersonData } from "@/lib/types";
 
 interface ProvinceVoteStats {
@@ -8,6 +8,7 @@ interface ProvinceVoteStats {
   agreeCount: number;
   disagreeCount: number;
   abstainCount: number;
+  noVoteCount: number;
   absentCount: number;
   total: number;
 }
@@ -19,6 +20,7 @@ interface MapTooltipProps {
   position: { x: number; y: number };
   isVisible: boolean;
   selectedVoteOption?: string | null;
+  containerWidth?: number; // เพิ่ม prop สำหรับความกว้างของ container
 }
 
 export default function MapTooltip({
@@ -28,24 +30,46 @@ export default function MapTooltip({
   position,
   isVisible,
   selectedVoteOption,
+  containerWidth,
 }: MapTooltipProps) {
-  // Simple position calculation with offset
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipWidth, setTooltipWidth] = useState(0);
+
+  // วัดความกว้างของ tooltip
+  useEffect(() => {
+    if (tooltipRef.current) {
+      setTooltipWidth(tooltipRef.current.offsetWidth);
+    }
+  }, [isVisible, provinceName]);
+
+  // คำนวณตำแหน่ง tooltip โดยตรวจสอบว่าใกล้ขอบขวาหรือไม่
   const tooltipPosition = useMemo(() => {
     const offset = 15;
+    const tooltipEstimatedWidth = tooltipWidth || 280; // ใช้ 280 เป็นค่าประมาณถ้ายังไม่ได้วัด
+    const containerW = containerWidth || 800; // ค่า default ถ้าไม่ได้ส่งมา
+
+    // ตรวจสอบว่าถ้าแสดง tooltip ทางขวาแล้วจะเกินขอบหรือไม่
+    const wouldOverflowRight =
+      position.x + offset + tooltipEstimatedWidth > containerW;
+
     return {
-      x: position.x + offset,
+      x: wouldOverflowRight
+        ? position.x - tooltipEstimatedWidth - offset // แสดงทางซ้าย
+        : position.x + offset, // แสดงทางขวาตามปกติ
       y: position.y + offset,
     };
-  }, [position]);
+  }, [position, tooltipWidth, containerWidth]);
 
   if (!isVisible) return null;
 
   return (
     <div
+      ref={tooltipRef}
       className="absolute z-50 pointer-events-none"
       style={{
         left: `${tooltipPosition.x}px`,
         top: `${tooltipPosition.y}px`,
+        fontFamily: "var(--font-sukhumvit), system-ui, sans-serif",
       }}
     >
       <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-3 min-w-[200px] max-w-[280px]">
@@ -120,7 +144,7 @@ export default function MapTooltip({
                           ? "#1F2937"
                           : selectedVoteOption === "ลา / ขาดลงมติ"
                           ? "#6B7280"
-                          : "#6B7280",
+                          : "#9CA3AF", // สีเทากลาง (gray-400) สำหรับ default
                     }}
                   >
                     {(
@@ -130,10 +154,12 @@ export default function MapTooltip({
                         ? voteStats.disagreeCount
                         : selectedVoteOption === "งดออกเสียง"
                         ? voteStats.abstainCount
+                        : selectedVoteOption === "ไม่ลงคะแนนเสียง"
+                        ? voteStats.noVoteCount
                         : selectedVoteOption === "ลา / ขาดลงมติ"
                         ? voteStats.absentCount
                         : 0) * 100
-                    ).toFixed(1)}
+                    ).toFixed(2)}
                     %
                   </span>
                 </div>

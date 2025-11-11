@@ -6,13 +6,13 @@ import {
   Typography,
   Autocomplete,
   TextField,
-  Radio,
   RadioGroup,
   FormControlLabel,
   FormControl,
   FormLabel,
   Box,
 } from "@mui/material";
+import { GrayRadio } from "./FilterPanel/StyledComponents";
 
 interface FilterPanelProps {
   voteEvents: string[];
@@ -48,7 +48,7 @@ export default function FilterPanel({
 
   return (
     <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
+      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
         หมวดหมู่
       </Typography>
 
@@ -63,9 +63,19 @@ export default function FilterPanel({
               {...params}
               placeholder="ค้นหาหมวดหมู่ที่สนใจ..."
               size="small"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: "0.875rem",
+                },
+              }}
             />
           )}
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 2,
+            "& .MuiAutocomplete-input": {
+              fontSize: "0.875rem",
+            },
+          }}
         />
       </Box>
 
@@ -81,7 +91,9 @@ export default function FilterPanel({
           getOptionLabel={(option) => option}
           renderOption={(props, option) => (
             <Box component="li" {...props}>
-              <Typography variant="body2">{option}</Typography>
+              <Typography variant="body2" fontSize="0.875rem">
+                {option}
+              </Typography>
             </Box>
           )}
           renderInput={(params) => (
@@ -89,6 +101,19 @@ export default function FilterPanel({
               {...params}
               placeholder="ค้นหาร่างกฎหมายที่สนใจ..."
               size="small"
+              multiline
+              sx={{
+                "& .MuiInputBase-root": {
+                  alignItems: "flex-start",
+                  paddingTop: "8px",
+                  paddingBottom: "8px",
+                  minHeight: "40px",
+                },
+                "& .MuiInputBase-input": {
+                  fontSize: "0.875rem",
+                  overflow: "visible",
+                },
+              }}
             />
           )}
           ListboxProps={{
@@ -118,33 +143,57 @@ export default function FilterPanel({
           >
             <FormControlLabel
               value=""
-              control={<Radio size="small" />}
-              label="ทั้งหมด"
+              control={<GrayRadio size="small" />}
+              label={
+                <Typography variant="body2" fontSize="0.875rem">
+                  ทั้งหมด
+                </Typography>
+              }
             />
             <FormControlLabel
               value="เห็นด้วย"
-              control={<Radio size="small" />}
-              label="เห็นด้วย"
+              control={<GrayRadio size="small" />}
+              label={
+                <Typography variant="body2" fontSize="0.875rem">
+                  เห็นด้วย
+                </Typography>
+              }
             />
             <FormControlLabel
               value="ไม่เห็นด้วย"
-              control={<Radio size="small" />}
-              label="ไม่เห็นด้วย"
+              control={<GrayRadio size="small" />}
+              label={
+                <Typography variant="body2" fontSize="0.875rem">
+                  ไม่เห็นด้วย
+                </Typography>
+              }
             />
             <FormControlLabel
               value="งดออกเสียง"
-              control={<Radio size="small" />}
-              label="งดออกเสียง"
+              control={<GrayRadio size="small" />}
+              label={
+                <Typography variant="body2" fontSize="0.875rem">
+                  งดออกเสียง
+                </Typography>
+              }
             />
             <FormControlLabel
               value="ไม่ลงคะแนนเสียง"
-              control={<Radio size="small" />}
-              label="ไม่ลงคะแนนเสียง"
+              control={<GrayRadio size="small" />}
+              label={
+                <Typography variant="body2" fontSize="0.875rem">
+                  ไม่ลงคะแนนเสียง
+                </Typography>
+              }
             />
             <FormControlLabel
               value="ลา / ขาดลงมติ"
-              control={<Radio size="small" />}
-              label="ลา/ขาดลงมติ"
+              control={<GrayRadio size="small" />}
+              label={
+                <Typography variant="body2" fontSize="0.875rem">
+                  ลา/ขาดลงมติ
+                </Typography>
+              }
             />
           </RadioGroup>
         </FormControl>

@@ -27,7 +27,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "var(--font-sarabun), Sarabun, sans-serif",
+    fontFamily: "var(--font-sukhumvit), system-ui, sans-serif",
   },
   components: {
     MuiCssBaseline: {
