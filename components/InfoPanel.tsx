@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import type { PersonData, VoteDetailData } from "@/lib/types";
-import { Paper, Typography, Box, Avatar } from "@mui/material";
+import { Paper, Typography, Box, Avatar, Tooltip } from "@mui/material";
 
 interface InfoPanelProps {
   province: string | null;
@@ -261,27 +261,34 @@ export default function InfoPanel({
             const isSelected = selectedMP?.person_name === mp.person_name;
 
             return (
-              <Box
+              <Tooltip
                 key={index}
-                onClick={() => setSelectedMP(mp)}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  bgcolor: color,
-                  cursor: "pointer",
-                  border: isSelected ? "3px solid #FF6B00" : "2px solid white",
-                  boxShadow: isSelected
-                    ? "0 0 8px rgba(255, 107, 0, 0.8)"
-                    : "0 2px 4px rgba(0,0,0,0.1)",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    transform: "scale(1.1)",
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                  },
-                }}
                 title={mp.person_name}
-              />
+                arrow
+                placement="top"
+              >
+                <Box
+                  onClick={() => setSelectedMP(mp)}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    bgcolor: color,
+                    cursor: "pointer",
+                    border: isSelected
+                      ? "3px solid #FF6B00"
+                      : "2px solid white",
+                    boxShadow: isSelected
+                      ? "0 0 8px rgba(255, 107, 0, 0.8)"
+                      : "0 2px 4px rgba(0,0,0,0.1)",
+                    transition: "all 0.2s",
+                    "&:hover": {
+                      transform: "scale(1.1)",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                    },
+                  }}
+                />
+              </Tooltip>
             );
           })}
         </Box>
