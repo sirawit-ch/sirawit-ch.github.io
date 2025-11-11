@@ -61,7 +61,6 @@ export default function FilterPanel({
           renderInput={(params) => (
             <TextField
               {...params}
-              label="หมวดหมู่ร่างกฎหมาย"
               placeholder="ค้นหาหมวดหมู่ที่สนใจ..."
               size="small"
             />
@@ -88,7 +87,6 @@ export default function FilterPanel({
           renderInput={(params) => (
             <TextField
               {...params}
-              label="ชื่อร่างกฎหมาย"
               placeholder="ค้นหาร่างกฎหมายที่สนใจ..."
               size="small"
             />

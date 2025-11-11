@@ -5,14 +5,14 @@ import * as d3 from "d3";
 import type { PersonData } from "@/lib/types";
 import { provinceGridLayout } from "@/lib/provinceGridSimple";
 import MapTooltip from "./MapTooltip";
-import {
-  Paper,
-  Typography,
-  Box,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
+// import {
+//   Paper,
+//   Typography,
+//   Box,
+//   List,
+//   ListItem,
+//   ListItemText,
+// } from "@mui/material";
 
 interface ProvinceVoteStats {
   province: string;
@@ -33,7 +33,7 @@ interface ThailandMapProps {
 
 export default function ThailandMap({
   politicians,
-  partyListMPs,
+  // partyListMPs,
   provinceVoteStats,
   onProvinceSelected,
   selectedVoteOption,
@@ -286,7 +286,7 @@ export default function ThailandMap({
   return (
     <div className="relative w-full h-full flex flex-col gap-3">
       {/* Party List MPs Block - ขวาบน */}
-      <Paper
+      {/* <Paper
         elevation={3}
         sx={{
           position: "absolute",
@@ -339,7 +339,7 @@ export default function ThailandMap({
             ))}
           </List>
         </Box>
-      </Paper>
+      </Paper> */}
 
       {/* Map SVG */}
       <div className="flex-1 relative">

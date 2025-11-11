@@ -8,11 +8,6 @@ interface InfoPanelProps {
   province: string | null;
   mps: PersonData[];
   totalMPs: number;
-  totalBills: number;
-  passedBills: number;
-  failedBills: number;
-  pendingBills: number;
-  latestVotingDate: string;
   voteDetailData: VoteDetailData[];
   allVoteDetailData?: VoteDetailData[]; // ข้อมูลทั้งหมดสำหรับ charts
 }
@@ -64,9 +59,6 @@ export default function InfoPanel({
   province,
   mps,
   totalMPs,
-  passedBills,
-  failedBills,
-  pendingBills,
   voteDetailData,
   allVoteDetailData,
 }: InfoPanelProps) {
@@ -74,6 +66,12 @@ export default function InfoPanel({
 
   // Use all data for charts if provided, otherwise use filtered data
   const chartVoteDetailData = allVoteDetailData || voteDetailData;
+
+  // นับจำนวนร่างกฎหมายที่มีการลงมติจริงๆ จาก voteDetailData
+  const uniqueVoteEvents = useMemo(() => {
+    const titles = new Set(allVoteDetailData?.map((vote) => vote.title) || []);
+    return titles.size;
+  }, [allVoteDetailData]);
 
   // Calculate MP stats from vote detail data for selected province
   const mpStats = useMemo(() => {
@@ -176,8 +174,6 @@ export default function InfoPanel({
 
   // Default view - Overall statistics
   if (!province || mps.length === 0) {
-    const totalVotes = passedBills + failedBills + pendingBills;
-
     return (
       <Paper
         elevation={3}
@@ -217,7 +213,7 @@ export default function InfoPanel({
             การลงมติทั้งหมด
           </Typography>
           <Typography variant="h4" fontWeight="bold" color="primary">
-            {totalVotes}
+            {uniqueVoteEvents}
           </Typography>
           <Typography variant="caption" color="text.secondary">
             ครั้ง

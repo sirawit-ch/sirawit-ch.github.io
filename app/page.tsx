@@ -210,9 +210,11 @@ export default function Home() {
               </p>
             </div>
             <div className="text-right">
+              {/*
               <div className="text-xs text-gray-500 ">
                 อัพเดทล่าสุด: 
               </div>
+              */}
             </div>
           </div>
         </div>
@@ -298,11 +300,6 @@ export default function Home() {
                 province={selectedProvince}
                 mps={selectedMPs}
                 totalMPs={people.length}
-                totalBills={allVoteEvents.length}
-                passedBills={0}
-                failedBills={0}
-                pendingBills={0}
-                latestVotingDate=""
                 voteDetailData={filteredVoteDetailData}
                 allVoteDetailData={voteDetailData}
               />
