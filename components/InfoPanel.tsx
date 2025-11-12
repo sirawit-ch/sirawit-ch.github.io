@@ -231,7 +231,7 @@ export default function InfoPanel({
               p: 1,
               bgcolor: "white",
               borderRadius: 2,
-              maxHeight: "150px",
+              maxHeight: "200px",
               overflowY: "auto",
             }}
           >

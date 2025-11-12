@@ -30,16 +30,6 @@ export default function FilterPanel({
   selectedVoteOption,
   onVoteOptionChange,
 }: FilterPanelProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  // ตัวอย่างหมวดหมู่ (สามารถดึงจาก API ได้)
-  const categories = [
-    "กฎหมายเกี่ยวกับการเมือง",
-    "กฎหมายเศรษฐกิจ",
-    "กฎหมายสังคม",
-    "กฎหมายสิ่งแวดล้อม",
-  ];
-
   const handleVoteOptionChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -48,173 +38,144 @@ export default function FilterPanel({
   };
 
   return (
-    <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
-      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-        หมวดหมู่
-      </Typography>
-
-      {/* หมวดหมู่ Autocomplete */}
-      <Box sx={{ mb: 3 }}>
-        <Autocomplete
-          options={categories}
-          value={selectedCategory}
-          onChange={(event, newValue) => setSelectedCategory(newValue)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder="ค้นหาหมวดหมู่ที่สนใจ..."
-              size="small"
-              sx={{
-                "& .MuiInputBase-input": {
-                  fontSize: "0.875rem",
-                },
-              }}
-            />
-          )}
-          sx={{
-            mb: 2,
-            "& .MuiAutocomplete-input": {
-              fontSize: "0.875rem",
-            },
-          }}
-        />
-      </Box>
-
-      {/* ร่างกฎหมาย Section */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle1" fontWeight="600" gutterBottom>
-          ร่างกฎหมาย
-        </Typography>
-        <Autocomplete
-          options={voteEvents}
-          value={selectedVoteEvent}
-          onChange={(event, newValue) => onVoteEventChange(newValue)}
-          disableClearable
-          getOptionLabel={(option) => option}
-          renderOption={(props, option) => {
-            const { key, ...otherProps } = props;
-            return (
-              <Box
-                key={key}
-                component="li"
-                {...otherProps}
+    <>
+      <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+        {/* ร่างกฎหมาย Section */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" fontWeight="600" gutterBottom>
+            ร่างกฎหมาย
+          </Typography>
+          <Autocomplete
+            options={voteEvents}
+            value={selectedVoteEvent || undefined}
+            onChange={(event, newValue) => onVoteEventChange(newValue)}
+            disableClearable
+            getOptionLabel={(option) => option}
+            renderOption={(props, option) => {
+              const { key, ...otherProps } = props;
+              return (
+                <Box
+                  key={key}
+                  component="li"
+                  {...otherProps}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography variant="body2" fontSize="0.875rem">
+                    {option}
+                  </Typography>
+                  {selectedVoteEvent === option && (
+                    <CheckIcon sx={{ fontSize: 18, color: "#1976D2", ml: 1 }} />
+                  )}
+                </Box>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="ค้นหาร่างกฎหมายที่สนใจ..."
+                size="small"
+                multiline
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  "& .MuiInputBase-root": {
+                    alignItems: "flex-start",
+                    paddingTop: "8px",
+                    paddingBottom: "8px",
+                    minHeight: "40px",
+                  },
+                  "& .MuiInputBase-input": {
+                    fontSize: "0.875rem",
+                    overflow: "visible",
+                  },
                 }}
-              >
-                <Typography variant="body2" fontSize="0.875rem">
-                  {option}
-                </Typography>
-                {selectedVoteEvent === option && (
-                  <CheckIcon sx={{ fontSize: 18, color: "#1976D2", ml: 1 }} />
-                )}
-              </Box>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder="ค้นหาร่างกฎหมายที่สนใจ..."
-              size="small"
-              multiline
-              sx={{
-                "& .MuiInputBase-root": {
-                  alignItems: "flex-start",
-                  paddingTop: "8px",
-                  paddingBottom: "8px",
-                  minHeight: "40px",
+              />
+            )}
+            ListboxProps={{
+              sx: {
+                maxWidth: "600px",
+                "& .MuiAutocomplete-option": {
+                  whiteSpace: "normal",
+                  wordBreak: "break-word",
                 },
-                "& .MuiInputBase-input": {
-                  fontSize: "0.875rem",
-                  overflow: "visible",
-                },
-              }}
-            />
-          )}
-          ListboxProps={{
-            sx: {
-              maxWidth: "600px",
-              "& .MuiAutocomplete-option": {
-                whiteSpace: "normal",
-                wordBreak: "break-word",
               },
-            },
-          }}
-        />
-      </Box>
+            }}
+          />
+        </Box>
 
-      {/* รูปแบบการโหวต Section */}
-      <Box>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">
-            <Typography variant="subtitle1" fontWeight="600">
-              รูปแบบการโหวต
-            </Typography>
-          </FormLabel>
-          <RadioGroup
-            value={selectedVoteOption || ""}
-            onChange={handleVoteOptionChange}
-            sx={{ mt: 1 }}
-          >
-            <FormControlLabel
-              value=""
-              control={<GrayRadio size="small" />}
-              label={
-                <Typography variant="body2" fontSize="0.875rem">
-                  ทั้งหมด
-                </Typography>
-              }
-            />
-            <FormControlLabel
-              value="เห็นด้วย"
-              control={<GrayRadio size="small" />}
-              label={
-                <Typography variant="body2" fontSize="0.875rem">
-                  เห็นด้วย
-                </Typography>
-              }
-            />
-            <FormControlLabel
-              value="ไม่เห็นด้วย"
-              control={<GrayRadio size="small" />}
-              label={
-                <Typography variant="body2" fontSize="0.875rem">
-                  ไม่เห็นด้วย
-                </Typography>
-              }
-            />
-            <FormControlLabel
-              value="งดออกเสียง"
-              control={<GrayRadio size="small" />}
-              label={
-                <Typography variant="body2" fontSize="0.875rem">
-                  งดออกเสียง
-                </Typography>
-              }
-            />
-            <FormControlLabel
-              value="ไม่ลงคะแนนเสียง"
-              control={<GrayRadio size="small" />}
-              label={
-                <Typography variant="body2" fontSize="0.875rem">
-                  ไม่ลงคะแนนเสียง
-                </Typography>
-              }
-            />
-            <FormControlLabel
-              value="ลา / ขาดลงมติ"
-              control={<GrayRadio size="small" />}
-              label={
-                <Typography variant="body2" fontSize="0.875rem">
-                  ลา/ขาดลงมติ
-                </Typography>
-              }
-            />
-          </RadioGroup>
-        </FormControl>
-      </Box>
-    </Paper>
+        {/* รูปแบบการโหวต Section */}
+        <Box>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">
+              <Typography variant="subtitle1" fontWeight="600">
+                รูปแบบการโหวต
+              </Typography>
+            </FormLabel>
+            <RadioGroup
+              value={selectedVoteOption || ""}
+              onChange={handleVoteOptionChange}
+              sx={{ mt: 1 }}
+            >
+              <FormControlLabel
+                value=""
+                control={<GrayRadio size="small" />}
+                label={
+                  <Typography variant="body2" fontSize="0.875rem">
+                    ทั้งหมด
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="เห็นด้วย"
+                control={<GrayRadio size="small" />}
+                label={
+                  <Typography variant="body2" fontSize="0.875rem">
+                    เห็นด้วย
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="ไม่เห็นด้วย"
+                control={<GrayRadio size="small" />}
+                label={
+                  <Typography variant="body2" fontSize="0.875rem">
+                    ไม่เห็นด้วย
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="งดออกเสียง"
+                control={<GrayRadio size="small" />}
+                label={
+                  <Typography variant="body2" fontSize="0.875rem">
+                    งดออกเสียง
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="ไม่ลงคะแนนเสียง"
+                control={<GrayRadio size="small" />}
+                label={
+                  <Typography variant="body2" fontSize="0.875rem">
+                    ไม่ลงคะแนนเสียง
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="ลา / ขาดลงมติ"
+                control={<GrayRadio size="small" />}
+                label={
+                  <Typography variant="body2" fontSize="0.875rem">
+                    ลา/ขาดลงมติ
+                  </Typography>
+                }
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box>
+      </Paper>
+    </>
   );
 }

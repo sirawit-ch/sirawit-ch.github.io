@@ -28,9 +28,9 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     ];
 
     const containerWidth = containerRef.current.clientWidth || 360;
-    const barHeight = 8;
-    const itemSpacing = 28;
-    const totalHeight = data.length * itemSpacing + 60;
+    const barHeight = 13;
+    const itemSpacing = 45;
+    const totalHeight = data.length * itemSpacing + 20;
 
     // Clear previous content
     d3.select(containerRef.current).selectAll("*").remove();
@@ -62,7 +62,7 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     items
       .append("text")
       .attr("x", 0)
-      .attr("y", 0)
+      .attr("y", 13)
       .attr("font-size", "12px")
       .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
       .attr("fill", "#6B7280")
@@ -72,7 +72,7 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     items
       .append("text")
       .attr("x", containerWidth - 16)
-      .attr("y", 0)
+      .attr("y", 12)
       .attr("text-anchor", "end")
       .attr("font-size", "12px")
       .attr("font-weight", "600")
@@ -84,7 +84,7 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     items
       .append("rect")
       .attr("x", 0)
-      .attr("y", 4)
+      .attr("y", 16)
       .attr("width", containerWidth - 16)
       .attr("height", barHeight)
       .attr("fill", "#E5E7EB")
@@ -94,7 +94,7 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     items
       .append("rect")
       .attr("x", 0)
-      .attr("y", 4)
+      .attr("y", 16)
       .attr("width", 0)
       .attr("height", barHeight)
       .attr("fill", (d) => d.color)
@@ -102,42 +102,9 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
       .transition()
       .duration(500)
       .attr("width", (d) => xScale(d.count));
-
-    // Add divider line
-    svg
-      .append("line")
-      .attr("x1", 0)
-      .attr("x2", containerWidth - 16)
-      .attr("y1", data.length * itemSpacing + 12)
-      .attr("y2", data.length * itemSpacing + 12)
-      .attr("stroke", "#E5E7EB")
-      .attr("stroke-width", 1);
-
-    // Add total label
-    svg
-      .append("text")
-      .attr("x", 0)
-      .attr("y", data.length * itemSpacing + 32)
-      .attr("font-size", "14px")
-      .attr("font-weight", "600")
-      .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
-      .attr("fill", "#374151")
-      .text("รวมทั้งหมด");
-
-    // Add total count
-    svg
-      .append("text")
-      .attr("x", containerWidth - 16)
-      .attr("y", data.length * itemSpacing + 32)
-      .attr("text-anchor", "end")
-      .attr("font-size", "14px")
-      .attr("font-weight", "600")
-      .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
-      .attr("fill", "#1976D2")
-      .text(`${stats.total} ครั้ง`);
   }, [stats]);
 
   return (
-    <div ref={containerRef} style={{ width: "100%", minHeight: "200px" }} />
+    <div ref={containerRef} style={{ width: "100%", minHeight: "250px" }} />
   );
 }
