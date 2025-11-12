@@ -6,6 +6,8 @@ import type { MPStats } from "./types";
 
 interface D3DonutChartProps {
   stats: MPStats;
+  width?: number;
+  height?: number;
 }
 
 /**
@@ -13,7 +15,11 @@ interface D3DonutChartProps {
  * Visualizes voting participation using a donut chart
  * Shows percentage of votes cast vs. abstained/absent
  */
-export default function D3DonutChart({ stats }: D3DonutChartProps) {
+export default function D3DonutChart({
+  stats,
+  width = 150,
+  height = 150,
+}: D3DonutChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -28,8 +34,6 @@ export default function D3DonutChart({ stats }: D3DonutChartProps) {
       { label: "ไม่ใช้สิทธิ์", value: other, color: "#D1D5DB" },
     ];
 
-    const width = 150;
-    const height = 150;
     const radius = Math.min(width, height) / 2;
     const innerRadius = radius * 0.6;
 
@@ -83,7 +87,7 @@ export default function D3DonutChart({ stats }: D3DonutChartProps) {
     g.append("text")
       .attr("text-anchor", "middle")
       .attr("dy", "0.35em")
-      .attr("font-size", "20px")
+      .attr("font-size", width > 130 ? "20px" : "16px")
       .attr("font-weight", "bold")
       .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
       .attr("fill", "#8B5CF6")
@@ -92,7 +96,7 @@ export default function D3DonutChart({ stats }: D3DonutChartProps) {
       .transition()
       .duration(800)
       .style("opacity", 1);
-  }, [stats]);
+  }, [stats, width, height]);
 
   return <svg ref={svgRef}></svg>;
 }

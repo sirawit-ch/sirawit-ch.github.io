@@ -28,8 +28,8 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     ];
 
     const containerWidth = containerRef.current.clientWidth || 360;
-    const barHeight = 13;
-    const itemSpacing = 45;
+    const barHeight = 10;
+    const itemSpacing = 38;
     const totalHeight = data.length * itemSpacing + 20;
 
     // Clear previous content
@@ -62,8 +62,8 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     items
       .append("text")
       .attr("x", 0)
-      .attr("y", 13)
-      .attr("font-size", "12px")
+      .attr("y", 10)
+      .attr("font-size", "11px")
       .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
       .attr("fill", "#6B7280")
       .text((d) => d.label);
@@ -72,9 +72,9 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
     items
       .append("text")
       .attr("x", containerWidth - 16)
-      .attr("y", 12)
+      .attr("y", 10)
       .attr("text-anchor", "end")
-      .attr("font-size", "12px")
+      .attr("font-size", "11px")
       .attr("font-weight", "600")
       .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
       .attr("fill", "#374151")
@@ -98,13 +98,13 @@ export default function D3BarChart({ stats }: D3BarChartProps) {
       .attr("width", 0)
       .attr("height", barHeight)
       .attr("fill", (d) => d.color)
-      .attr("rx", 4)
+      .attr("rx", 3)
       .transition()
       .duration(500)
       .attr("width", (d) => xScale(d.count));
   }, [stats]);
 
   return (
-    <div ref={containerRef} style={{ width: "100%", minHeight: "250px" }} />
+    <div ref={containerRef} style={{ width: "100%", minHeight: "210px" }} />
   );
 }

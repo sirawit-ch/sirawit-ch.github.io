@@ -195,43 +195,48 @@ export default function InfoPanel({
         p: 2,
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "auto",
       }}
     >
       {/* Header - Fixed */}
       <Box
         sx={{
-          mb: 2,
-          pb: 1,
+          mb: 1,
+          pb: 0.5,
           borderBottom: 1,
           borderColor: "divider",
           flexShrink: 0,
         }}
       >
-        <Typography variant="h6" fontWeight="bold" color="primary">
+        <Typography variant="subtitle1" fontWeight="bold" color="primary">
           {province}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="caption" color="text.secondary">
           ส.ส. ทั้งหมด {mps.length} คน
         </Typography>
       </Box>
 
       {/* Scrollable Content */}
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
         {/* MPs Visualization - Circles */}
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+        <Box sx={{ flexShrink: 0 }}>
+          <Typography
+            variant="caption"
+            fontWeight="600"
+            gutterBottom
+            sx={{ display: "block", mb: 0.5 }}
+          >
             ส.ส. ทั้งหมด
           </Typography>
           <Box
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              gap: 1,
+              gap: 0.75,
               p: 1,
               bgcolor: "white",
-              borderRadius: 2,
-              maxHeight: "200px",
+              borderRadius: 1.5,
+              maxHeight: "120px",
               overflowY: "auto",
             }}
           >
@@ -255,21 +260,21 @@ export default function InfoPanel({
                   <Box
                     onClick={() => setSelectedMP(mp)}
                     sx={{
-                      width: 32,
-                      height: 32,
+                      width: 28,
+                      height: 28,
                       borderRadius: "50%",
                       bgcolor: color,
                       cursor: "pointer",
                       border: isSelected
-                        ? "3px solid #FF6B00"
-                        : "2px solid white",
+                        ? "2px solid #FF6B00"
+                        : "1.5px solid white",
                       boxShadow: isSelected
-                        ? "0 0 8px rgba(255, 107, 0, 0.8)"
-                        : "0 2px 4px rgba(0,0,0,0.1)",
+                        ? "0 0 6px rgba(255, 107, 0, 0.8)"
+                        : "0 1px 2px rgba(0,0,0,0.1)",
                       transition: "all 0.2s",
                       "&:hover": {
                         transform: "scale(1.1)",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                       },
                     }}
                   />
@@ -284,40 +289,44 @@ export default function InfoPanel({
           <>
             <Box
               sx={{
-                mb: 2,
-                p: 2,
+                flexShrink: 0,
+                p: 1.5,
                 bgcolor: "white",
-                borderRadius: 2,
+                borderRadius: 1.5,
                 border: "2px solid #FF6B00",
               }}
             >
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+                sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}
               >
                 <Avatar
                   src={selectedMP.image || undefined}
                   variant="square"
                   sx={{
-                    width: 56,
-                    height: 56,
-                    boxShadow: `6px 6px 0px ${selectedMP.party_color}`,
-                    border: "3px solid white",
+                    width: 48,
+                    height: 48,
+                    boxShadow: `4px 4px 0px ${selectedMP.party_color}`,
+                    border: "2px solid white",
                   }}
                 >
                   {selectedMP.person_name.charAt(0)}
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="body1" fontWeight="600">
+                  <Typography variant="body2" fontWeight="600">
                     {selectedMP.person_name}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontSize: "0.7rem" }}
+                  >
                     {selectedMP.member_of}
                   </Typography>
                 </Box>
                 {selectedMP.party_image && (
                   <Avatar
                     src={selectedMP.party_image}
-                    sx={{ width: 40, height: 40 }}
+                    sx={{ width: 32, height: 32 }}
                     variant="square"
                   />
                 )}
@@ -329,21 +338,21 @@ export default function InfoPanel({
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
-                    p: 1,
+                    gap: 0.75,
+                    p: 0.75,
                     bgcolor: "#F9FAFB",
                     borderRadius: 1,
                   }}
                 >
                   <Box
                     sx={{
-                      width: 16,
-                      height: 16,
+                      width: 14,
+                      height: 14,
                       borderRadius: "50%",
                       bgcolor: getActionColor(selectedMPCurrentVote.option),
                     }}
                   />
-                  <Typography variant="body2" fontWeight="500">
+                  <Typography variant="caption" fontWeight="500">
                     {selectedMPCurrentVote.option}
                   </Typography>
                 </Box>
@@ -352,21 +361,21 @@ export default function InfoPanel({
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
-                    p: 1,
+                    gap: 0.75,
+                    p: 0.75,
                     bgcolor: "#F9FAFB",
                     borderRadius: 1,
                   }}
                 >
                   <Box
                     sx={{
-                      width: 16,
-                      height: 16,
+                      width: 14,
+                      height: 14,
                       borderRadius: "50%",
                       bgcolor: "#9CA3AF",
                     }}
                   />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="caption" color="text.secondary">
                     ไม่มีข้อมูลการลงมติ
                   </Typography>
                 </Box>
@@ -374,57 +383,43 @@ export default function InfoPanel({
             </Box>
 
             {/* Donut Chart - สัดส่วนการใช้สิทธิ */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+            <Box sx={{ flexShrink: 0, mb: 1.5 }}>
+              <Typography
+                variant="caption"
+                fontWeight="600"
+                sx={{ display: "block", mb: 0.5 }}
+              >
                 สัดส่วนการใช้สิทธิ์
               </Typography>
               <Box
                 sx={{
+                  display: "flex",
+                  justifyContent: "center",
                   position: "relative",
-                  width: 150,
-                  height: 150,
-                  mx: "auto",
-                  my: 1,
                 }}
               >
-                <D3DonutChart stats={selectedMPStats} />
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Box
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      bgcolor: "#8B5CF6", // สีม่วง
-                      borderRadius: 1,
-                    }}
-                  />
-                  <Typography variant="caption">ใช้สิทธิ์</Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Box
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      bgcolor: "#D1D5DB",
-                      borderRadius: 1,
-                    }}
-                  />
-                  <Typography variant="caption">ไม่ใช้สิทธิ์</Typography>
-                </Box>
+                <D3DonutChart
+                  stats={selectedMPStats}
+                  width={120}
+                  height={120}
+                />
               </Box>
             </Box>
 
             {/* Bar Chart - ภาพรวมการโหวต */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+            <Box sx={{ flexShrink: 0 }}>
+              <Typography
+                variant="caption"
+                fontWeight="600"
+                sx={{ display: "block", mb: 0.5 }}
+              >
                 ภาพรวมการโหวต
               </Typography>
               <Box
                 sx={{
-                  p: 2,
+                  p: 1.5,
                   bgcolor: "white",
-                  borderRadius: 2,
+                  borderRadius: 1.5,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
