@@ -194,7 +194,7 @@ def transform_person_data(people):
 
     # Merge to create final person table
     df_person = pd.merge(df_rep, df_party, on="person__name", how="left")
-    df_person = df_person[["person__prefix", "person__name", "person__image", "member_of", "party_image", "party_color"]].rename(columns={"person__prefix": "prefix", "person__name": "person_name", "person__image": "image"})
+    df_person = df_person[["person__prefix", "person__name", "person__image", "m__province", "member_of", "party_image", "party_color"]].rename(columns={"person__prefix": "prefix", "person__name": "person_name", "person__image": "image", "m__province": "province"})
 
     print(f"  Created person data: {len(df_person)} records")
     return df_person
@@ -256,13 +256,13 @@ def create_fact_data(df_votes, df_person):
     # Merge with person data to get province
     df_fact_votes = df_votes[df_votes["event__start_date"].str[:4] == "2025"][["event__title", "event__start_date", "event__end_date", "voters__name", "vote__option"]]
     df_fact_votes = pd.merge(df_fact_votes, df_person, left_on="voters__name", right_on="person_name", how="left")
-    df_fact_votes = df_fact_votes[~(df_fact_votes["person_name"].isna()) & (df_fact_votes["event__title"] != exclude_title)].groupby(["event__title", "m__province", "vote__option"]).size().reset_index(name="no_of_option")
+    df_fact_votes = df_fact_votes[~(df_fact_votes["person_name"].isna()) & (df_fact_votes["event__title"] != exclude_title)].groupby(["event__title", "event__start_date", "province", "vote__option"]).size().reset_index(name="no_of_option")
 
     # Find majority vote per province (handling ties)
-    df_fact_votes = df_fact_votes[df_fact_votes["no_of_option"] == df_fact_votes.groupby(["event__title", "m__province"])["no_of_option"].transform("max")]
+    df_fact_votes = df_fact_votes[df_fact_votes["no_of_option"] == df_fact_votes.groupby(["event__title", "event__start_date", "province"])["no_of_option"].transform("max")]
 
     # Handle ties between agree/disagree
-    g = df_fact_votes.groupby(["event__title", "m__province"])["vote__option"]
+    g = df_fact_votes.groupby(["event__title", "event__start_date", "province"])["vote__option"]
     size = g.transform("size")
     has_yes = g.transform(lambda s: (s == "เห็นด้วย").any())
     has_no = g.transform(lambda s: (s == "ไม่เห็นด้วย").any())
@@ -270,11 +270,11 @@ def create_fact_data(df_votes, df_person):
 
     df_fact_votes["result"] = df_fact_votes["vote__option"]
     df_fact_votes.loc[tie_mask, "result"] = "ผลโหวตเสมอ"
-    df_fact_votes = df_fact_votes[["event__title", "m__province", "result"]].drop_duplicates()
+    df_fact_votes = df_fact_votes[["event__title", "event__start_date", "province", "result"]].drop_duplicates()
 
     # Remove abstain/absent if there's another result
     for remove_option in ["ลา / ขาดลงมติ", "งดออกเสียง", "ไม่ลงคะแนนเสียง"]:
-        g = df_fact_votes.groupby(["event__title", "m__province"])["result"]
+        g = df_fact_votes.groupby(["event__title", "event__start_date", "province"])["result"]
         size = g.transform("size")
         tie_mask = (size > 1) & (df_fact_votes["result"] == remove_option)
         df_fact_votes.loc[tie_mask, "result"] = "ไม่เอา"
@@ -283,38 +283,38 @@ def create_fact_data(df_votes, df_person):
     # Calculate portions
     df_fact_portion = df_votes[df_votes["event__start_date"].str[:4] == "2025"][["event__title", "voters__name", "vote__option"]]
     df_fact_portion = pd.merge(df_fact_portion, df_person, left_on="voters__name", right_on="person_name", how="left")
-    df_fact_portion = df_fact_portion[~(df_fact_portion["person_name"].isna()) & (df_fact_portion["event__title"] != exclude_title)].groupby(["event__title", "m__province", "vote__option"]).size().reset_index(name="no_of_option")
+    df_fact_portion = df_fact_portion[~(df_fact_portion["person_name"].isna()) & (df_fact_portion["event__title"] != exclude_title)].groupby(["event__title", "province", "vote__option"]).size().reset_index(name="no_of_option")
 
     # Calculate use right portion
     df_fact_portion["use_a_right"] = df_fact_portion["vote__option"].apply(lambda x: "ไม่ใช้สิทธิ์" if x == "ลา / ขาดลงมติ" else "ใช้สิทธิ์")
-    df_fact_portion = df_fact_portion.groupby(["event__title", "m__province", "use_a_right"]).agg(no_of_person=("no_of_option", "sum")).reset_index()
+    df_fact_portion = df_fact_portion.groupby(["event__title", "province", "use_a_right"]).agg(no_of_person=("no_of_option", "sum")).reset_index()
     
-    df_fact_total = df_fact_portion.groupby(["event__title", "m__province"])["no_of_person"].transform("sum")
+    df_fact_total = df_fact_portion.groupby(["event__title", "province"])["no_of_person"].transform("sum")
     df_fact_portion["portion_use_right"] = df_fact_portion["no_of_person"] / df_fact_total
 
-    g = df_fact_portion.groupby(["event__title", "m__province"])["use_a_right"]
+    g = df_fact_portion.groupby(["event__title", "province"])["use_a_right"]
     size = g.transform("size")
     tie_mask = (size > 1) & (df_fact_portion["use_a_right"] == "ไม่ใช้สิทธิ์")
     df_fact_portion.loc[tie_mask, "use_a_right"] = "ไม่เอา"
     df_fact_portion = df_fact_portion[df_fact_portion["use_a_right"] != "ไม่เอา"]
 
     # Merge results with portions
-    df_fact_votes = pd.merge(df_fact_votes, df_fact_portion, on=["event__title", "m__province"], how="left")
+    df_fact_votes = pd.merge(df_fact_votes, df_fact_portion, on=["event__title", "province"], how="left")
     df_fact_votes.loc[(df_fact_votes["use_a_right"] == "ไม่ใช้สิทธิ์"), "portion_use_right"] = 0.0
     df_fact_votes["type"] = "All"
 
     # Calculate detailed option portions
     df_fact_option = df_votes[df_votes["event__start_date"].str[:4] == "2025"][["event__title", "voters__name", "vote__option"]]
     df_fact_option = pd.merge(df_fact_option, df_person, left_on="voters__name", right_on="person_name", how="left")
-    df_fact_option = df_fact_option[~(df_fact_option["person_name"].isna()) & (df_fact_option["event__title"] != exclude_title)].groupby(["event__title", "m__province", "vote__option"]).size().reset_index(name="no_of_option")
+    df_fact_option = df_fact_option[~(df_fact_option["person_name"].isna()) & (df_fact_option["event__title"] != exclude_title)].groupby(["event__title", "province", "vote__option"]).size().reset_index(name="no_of_option")
 
-    df_fact_size = df_fact_option.groupby(["event__title", "m__province"])["no_of_option"].transform("sum")
+    df_fact_size = df_fact_option.groupby(["event__title", "province"])["no_of_option"].transform("sum")
     df_fact_option["portion"] = df_fact_option["no_of_option"] / df_fact_size
     df_fact_option["type"] = df_fact_option["vote__option"]
 
     # Combine both fact tables
-    df_fact_votes = df_fact_votes[["event__title", "m__province", "result", "portion_use_right", "type"]].rename(columns={"event__title": "title", "m__province": "province", "result": "option", "portion_use_right": "portion"})
-    df_fact_option = df_fact_option[["event__title", "m__province", "vote__option", "portion", "type"]].rename(columns={"event__title": "title", "m__province": "province", "vote__option": "option"})
+    df_fact_votes = df_fact_votes[["event__title", "event__start_date", "province", "result", "portion_use_right", "type"]].rename(columns={"event__title": "title", "result": "option", "portion_use_right": "portion", "event__start_date": "event_start_date"})
+    df_fact_option = df_fact_option[["event__title", "province", "vote__option", "portion", "type"]].rename(columns={"event__title": "title", "vote__option": "option"})
     
     df_fact = pd.concat([df_fact_votes, df_fact_option], ignore_index=True)
 
@@ -330,7 +330,7 @@ def create_vote_detail_data(df_votes, df_person):
     df_vote_detail = df_votes[df_votes["event__start_date"].str[:4] == "2025"][["event__title", "voters__name", "vote__option"]]
     df_vote_detail = pd.merge(df_vote_detail, df_person, left_on="voters__name", right_on="person_name", how="left")
     df_vote_detail = df_vote_detail[~(df_vote_detail["person_name"].isna()) & (df_vote_detail["event__title"] != exclude_title)]
-    df_vote_detail = df_vote_detail[["event__title", "m__province", "voters__name", "vote__option"]].rename(columns={"event__title": "title", "m__province": "province", "voters__name": "person_name", "vote__option": "option"})
+    df_vote_detail = df_vote_detail[["event__title", "province", "voters__name", "vote__option"]].rename(columns={"event__title": "title", "voters__name": "person_name", "vote__option": "option"})
 
     print(f"  Created vote detail data: {len(df_vote_detail)} records")
     return df_vote_detail
