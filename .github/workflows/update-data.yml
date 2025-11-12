@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
-          pip install requests
+          pip install requests pandas
 
       - name: Generate new data
         run: |
