@@ -12,6 +12,7 @@ import {
   FormLabel,
   Box,
 } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
 import { GrayRadio } from "./FilterPanel/StyledComponents";
 
 interface FilterPanelProps {
@@ -88,14 +89,30 @@ export default function FilterPanel({
           options={voteEvents}
           value={selectedVoteEvent}
           onChange={(event, newValue) => onVoteEventChange(newValue)}
+          disableClearable
           getOptionLabel={(option) => option}
-          renderOption={(props, option) => (
-            <Box component="li" {...props}>
-              <Typography variant="body2" fontSize="0.875rem">
-                {option}
-              </Typography>
-            </Box>
-          )}
+          renderOption={(props, option) => {
+            const { key, ...otherProps } = props;
+            return (
+              <Box
+                key={key}
+                component="li"
+                {...otherProps}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography variant="body2" fontSize="0.875rem">
+                  {option}
+                </Typography>
+                {selectedVoteEvent === option && (
+                  <CheckIcon sx={{ fontSize: 18, color: "#1976D2", ml: 1 }} />
+                )}
+              </Box>
+            );
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
