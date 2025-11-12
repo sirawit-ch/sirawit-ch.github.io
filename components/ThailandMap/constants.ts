@@ -26,7 +26,7 @@ export const OPACITY_CONFIG = {
 export const VOTE_OPTION_COLORS = {
   เห็นด้วย: "0, 199, 88", // #00C758 in RGB
   ไม่เห็นด้วย: "239, 68, 68", // #EF4444 in RGB
-  งดออกเสียง: "237, 178, 0", // #EDB200 in RGB
+  งดออกเสียง: "237, 178, 0", // #EDB200 in RGB TODO CHANGE COLOR
   ไม่ลงคะแนนเสียง: "31, 41, 55", // #1F2937 in RGB
   "ลา / ขาดลงมติ": "107, 114, 128", // #6B7280 in RGB
 } as const;

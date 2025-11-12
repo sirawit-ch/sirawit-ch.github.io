@@ -432,31 +432,6 @@ export default function InfoPanel({
               >
                 {/* D3 Vertical Bar Chart */}
                 <D3BarChart stats={selectedMPStats} />
-
-                {/* Total */}
-                <Box
-                  sx={{
-                    mt: 1.5,
-                    pt: 1.5,
-                    borderTop: 1,
-                    borderColor: "divider",
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <Typography variant="body2" fontWeight="600">
-                      {"รวมทั้งหมด"}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontWeight="600"
-                      color="primary"
-                    >
-                      {selectedMPStats.total} ครั้ง
-                    </Typography>
-                  </Box>
-                </Box>
               </Box>
             </Box>
           </>

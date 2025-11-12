@@ -9,114 +9,135 @@ interface D3BarChartProps {
 }
 
 /**
- * D3 Bar Chart Component
+ * D3 Horizontal Bar Chart Component
  * Displays vote breakdown across all voting categories
  * Shows count for each: Agree, Disagree, Abstain, No Vote, Absent
  */
 export default function D3BarChart({ stats }: D3BarChartProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current || !stats) return;
+    if (!containerRef.current || !stats) return;
 
     const data = [
-      { label: "เห็น\nด้วย", count: stats.agreeCount, color: "#00C758" },
-      { label: "ไม่เห็น\nด้วย", count: stats.disagreeCount, color: "#EF4444" },
-      { label: "งด\nออกเสียง", count: stats.abstainCount, color: "#EDB200" },
-      { label: "ไม่ลง\nคะแนน", count: stats.noVoteCount, color: "#1F2937" },
-      { label: "ลา/\nขาดลงมติ", count: stats.absentCount, color: "#6B7280" },
+      { label: "เห็นด้วย", count: stats.agreeCount, color: "#00C758" },
+      { label: "ไม่เห็นด้วย", count: stats.disagreeCount, color: "#EF4444" },
+      { label: "งดออกเสียง", count: stats.abstainCount, color: "#EDB200" },
+      { label: "ไม่ลงคะแนน", count: stats.noVoteCount, color: "#1F2937" },
+      { label: "ลา/ขาดลงมติ", count: stats.absentCount, color: "#6B7280" },
     ];
 
-    const width = 360;
-    const height = 180;
-    const margin = { top: 10, right: 10, bottom: 40, left: 10 };
-    const chartWidth = width - margin.left - margin.right;
-    const chartHeight = height - margin.top - margin.bottom;
+    const containerWidth = containerRef.current.clientWidth || 360;
+    const barHeight = 8;
+    const itemSpacing = 28;
+    const totalHeight = data.length * itemSpacing + 60;
 
     // Clear previous content
-    d3.select(svgRef.current).selectAll("*").remove();
+    d3.select(containerRef.current).selectAll("*").remove();
 
     const svg = d3
-      .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height);
+      .select(containerRef.current)
+      .append("svg")
+      .attr("width", containerWidth)
+      .attr("height", totalHeight)
+      .style("background", "white")
+      .style("border-radius", "8px")
+      .style("padding", "8px");
 
-    const chart = svg
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Scales
+    // Scale for bar width
     const xScale = d3
-      .scaleBand()
-      .domain(data.map((d) => d.label))
-      .range([0, chartWidth])
-      .padding(0.3);
-
-    const yScale = d3
       .scaleLinear()
       .domain([0, stats.total || 1])
-      .range([chartHeight, 0]);
+      .range([0, containerWidth - 16]);
 
-    // Draw bars
-    chart
-      .selectAll(".bar")
+    // Create groups for each item
+    const items = svg
+      .selectAll(".item")
       .data(data)
-      .join("rect")
-      .attr("class", "bar")
-      .attr("x", (d) => xScale(d.label) || 0)
-      .attr("y", chartHeight)
-      .attr("width", xScale.bandwidth())
-      .attr("height", 0)
-      .attr("fill", (d) => d.color)
-      .attr("rx", 2)
-      .transition()
-      .duration(500)
-      .attr("y", (d) => yScale(d.count))
-      .attr("height", (d) => chartHeight - yScale(d.count));
+      .join("g")
+      .attr("class", "item")
+      .attr("transform", (_, i) => `translate(0, ${i * itemSpacing})`);
 
-    // Add count labels on top of bars
-    chart
-      .selectAll(".label")
-      .data(data)
-      .join("text")
-      .attr("class", "label")
-      .attr("x", (d) => (xScale(d.label) || 0) + xScale.bandwidth() / 2)
-      .attr("y", (d) => yScale(d.count) - 5)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "16px")
+    // Add labels (left)
+    items
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("font-size", "12px")
+      .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
+      .attr("fill", "#6B7280")
+      .text((d) => d.label);
+
+    // Add counts (right)
+    items
+      .append("text")
+      .attr("x", containerWidth - 16)
+      .attr("y", 0)
+      .attr("text-anchor", "end")
+      .attr("font-size", "12px")
       .attr("font-weight", "600")
       .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
       .attr("fill", "#374151")
-      .text((d) => (d.count > 0 ? d.count : ""))
-      .style("opacity", 0)
+      .text((d) => d.count);
+
+    // Add background bars
+    items
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 4)
+      .attr("width", containerWidth - 16)
+      .attr("height", barHeight)
+      .attr("fill", "#E5E7EB")
+      .attr("rx", 4);
+
+    // Add colored bars with animation
+    items
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 4)
+      .attr("width", 0)
+      .attr("height", barHeight)
+      .attr("fill", (d) => d.color)
+      .attr("rx", 4)
       .transition()
       .duration(500)
-      .style("opacity", 1);
+      .attr("width", (d) => xScale(d.count));
 
-    // Add x-axis labels
-    chart
-      .selectAll(".x-label")
-      .data(data)
-      .join("text")
-      .attr("class", "x-label")
-      .attr("x", (d) => (xScale(d.label) || 0) + xScale.bandwidth() / 2)
-      .attr("y", chartHeight + 15)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "11px")
+    // Add divider line
+    svg
+      .append("line")
+      .attr("x1", 0)
+      .attr("x2", containerWidth - 16)
+      .attr("y1", data.length * itemSpacing + 12)
+      .attr("y2", data.length * itemSpacing + 12)
+      .attr("stroke", "#E5E7EB")
+      .attr("stroke-width", 1);
+
+    // Add total label
+    svg
+      .append("text")
+      .attr("x", 0)
+      .attr("y", data.length * itemSpacing + 32)
+      .attr("font-size", "14px")
+      .attr("font-weight", "600")
       .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
-      .attr("fill", "#6B7280")
-      .each(function (d) {
-        const lines = d.label.split("\n");
-        const text = d3.select(this);
-        lines.forEach((line, i) => {
-          text
-            .append("tspan")
-            .attr("x", (xScale(d.label) || 0) + xScale.bandwidth() / 2)
-            .attr("dy", i === 0 ? 0 : 11)
-            .text(line);
-        });
-      });
+      .attr("fill", "#374151")
+      .text("รวมทั้งหมด");
+
+    // Add total count
+    svg
+      .append("text")
+      .attr("x", containerWidth - 16)
+      .attr("y", data.length * itemSpacing + 32)
+      .attr("text-anchor", "end")
+      .attr("font-size", "14px")
+      .attr("font-weight", "600")
+      .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
+      .attr("fill", "#1976D2")
+      .text(`${stats.total} ครั้ง`);
   }, [stats]);
 
-  return <svg ref={svgRef}></svg>;
+  return (
+    <div ref={containerRef} style={{ width: "100%", minHeight: "200px" }} />
+  );
 }
