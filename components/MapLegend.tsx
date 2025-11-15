@@ -2,29 +2,32 @@
 
 import React from "react";
 import { Paper, Box, Typography } from "@mui/material";
-import { VOTE_OPTION_SINGLE_COLORS } from "./ThailandMap/constants";
+import {
+  VOTE_OPTION_SINGLE_COLORS,
+  VOTE_OPTION_GRADIENT_COLORS,
+} from "./ThailandMap/constants";
 
 interface MapLegendProps {
   selectedVoteOption: string | null;
 }
 
 export default function MapLegend({ selectedVoteOption }: MapLegendProps) {
-  // Get the current color being displayed
-  const getCurrentColor = () => {
+  // Get the current gradient colors being displayed
+  const getCurrentGradient = () => {
     if (!selectedVoteOption) {
       // Show all possible colors when "ทั้งหมด" is selected
       return null;
     }
-    return VOTE_OPTION_SINGLE_COLORS[
-      selectedVoteOption as keyof typeof VOTE_OPTION_SINGLE_COLORS
+    return VOTE_OPTION_GRADIENT_COLORS[
+      selectedVoteOption as keyof typeof VOTE_OPTION_GRADIENT_COLORS
     ];
   };
 
-  const currentColor = getCurrentColor();
+  const currentGradient = getCurrentGradient();
 
   // Generate gradient for the legend
-  const generateGradient = (color: string) => {
-    return `linear-gradient(to right, #f5f5f5, ${color})`;
+  const generateGradient = (lightColor: string, darkColor: string) => {
+    return `linear-gradient(to right, ${lightColor}, ${darkColor})`;
   };
 
   return (
@@ -103,7 +106,9 @@ export default function MapLegend({ selectedVoteOption }: MapLegendProps) {
                   width: 16,
                   height: 16,
                   borderRadius: "4px",
-                  backgroundColor: currentColor,
+                  background: currentGradient
+                    ? generateGradient(currentGradient[0], currentGradient[1])
+                    : "#e0e0e0",
                   border: "1px solid rgba(0,0,0,0.1)",
                   flexShrink: 0,
                 }}
@@ -149,8 +154,8 @@ export default function MapLegend({ selectedVoteOption }: MapLegendProps) {
                   flex: 1,
                   height: 12,
                   borderRadius: "6px",
-                  background: currentColor
-                    ? generateGradient(currentColor)
+                  background: currentGradient
+                    ? generateGradient(currentGradient[0], currentGradient[1])
                     : "#e0e0e0",
                   border: "1px solid rgba(0,0,0,0.1)",
                 }}

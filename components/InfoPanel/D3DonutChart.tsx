@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import type { MPStats } from "./types";
-import { USAGE_COLORS, DEFAULT_COLORS } from "../ThailandMap/constants";
+import { USAGE_COLORS } from "../ThailandMap/constants";
 
 interface D3DonutChartProps {
   stats: MPStats;
@@ -14,17 +14,17 @@ interface D3DonutChartProps {
 /**
  * D3 Donut Chart Component
  * Visualizes voting participation using a donut chart
- * Shows percentage of votes cast vs. abstained/absent with external labels
+ * Shows percentage of votes cast vs. abstained/absent
  */
 export default function D3DonutChart({
   stats,
-  width = 140,
-  height = 140,
+  width = 150,
+  height = 150,
 }: D3DonutChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current || !stats) return;
+    if (!svgRef.current || !stats) return;
 
     const used = stats.agreeCount + stats.disagreeCount;
     const other = stats.abstainCount + stats.noVoteCount + stats.absentCount;
@@ -32,20 +32,17 @@ export default function D3DonutChart({
 
     const data = [
       { label: "ใช้สิทธิ์", value: used, color: USAGE_COLORS.USED },
-      { label: "ไม่ใช้สิทธิ์", value: other, color: USAGE_COLORS.NOT_USED },
+      { label: "ไม่ใช้สิทธิ์", value: other, color: "white" },
     ];
 
-    // Reserve space for labels
-    const chartSize = Math.min(width, height);
-    const radius = chartSize * 0.35; // Reduce donut size to make room for labels
+    const radius = Math.min(width, height) / 2;
     const innerRadius = radius * 0.6;
 
     // Clear previous content
-    d3.select(containerRef.current).selectAll("*").remove();
+    d3.select(svgRef.current).selectAll("*").remove();
 
     const svg = d3
-      .select(containerRef.current)
-      .append("svg")
+      .select(svgRef.current)
       .attr("width", width)
       .attr("height", height);
 
@@ -57,21 +54,13 @@ export default function D3DonutChart({
     const pie = d3
       .pie<{ label: string; value: number; color: string }>()
       .value((d) => d.value)
-      .sort(null)
-      .startAngle(-Math.PI / 2)
-      .endAngle((3 * Math.PI) / 2);
+      .sort(null);
 
     // Create arc generator
     const arc = d3
       .arc<d3.PieArcDatum<{ label: string; value: number; color: string }>>()
       .innerRadius(innerRadius)
       .outerRadius(radius);
-
-    // Arc for label positioning (outside the donut)
-    const outerArc = d3
-      .arc<d3.PieArcDatum<{ label: string; value: number; color: string }>>()
-      .innerRadius(radius * 1.15)
-      .outerRadius(radius * 1.15);
 
     // Draw arcs
     const arcs = g
@@ -80,7 +69,8 @@ export default function D3DonutChart({
       .join("path")
       .attr("class", "arc")
       .attr("fill", (d) => d.data.color)
-      .attr("stroke", "none");
+      .attr("stroke", "white")
+      .attr("stroke-width", 2);
 
     // Animate arcs
     arcs
@@ -93,53 +83,22 @@ export default function D3DonutChart({
         };
       });
 
-    // Add text labels positioned at segment centroids
-    const pieData = pie(data);
-
-    pieData.forEach((d) => {
-      const percent = ((d.data.value / total) * 100).toFixed(1);
-      const centroid = outerArc.centroid(d);
-
-      // Position labels closer to donut
-      const x = centroid[0] * 1.15;
-      const y = centroid[1] * 1.15;
-
-      // Create text group
-      const textGroup = g.append("g").attr("transform", `translate(${x},${y})`);
-
-      // Add label text
-      textGroup
-        .append("text")
-        .attr("text-anchor", x > 0 ? "start" : "end")
-        .attr("dy", "-0.2em")
-        .attr("font-size", "8px")
-        .attr("font-weight", "600")
-        .attr("fill", DEFAULT_COLORS.GRAY_700)
-        .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
-        .text(d.data.label);
-
-      // Add percentage text
-      textGroup
-        .append("text")
-        .attr("text-anchor", x > 0 ? "start" : "end")
-        .attr("dy", "0.7em")
-        .attr("font-size", "9px")
-        .attr("font-weight", "700")
-        .attr(
-          "fill",
-          d.data.label === "ใช้สิทธิ์"
-            ? d.data.color
-            : USAGE_COLORS.NOT_USED_TEXT
-        )
-        .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
-        .text(`${percent}%`);
-    });
+    // Add center text (percentage)
+    const usedPercent = (used / total) * 100;
+    g.append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", "0.35em")
+      .attr("font-size", width > 130 ? "20px" : "16px")
+      .attr("font-weight", "bold")
+      .attr("font-family", "var(--font-sukhumvit), system-ui, sans-serif")
+      .attr("fill", USAGE_COLORS.USED)
+      .text(`${usedPercent.toFixed(0)}%`)
+      .style("opacity", 0)
+      .transition()
+      .duration(800)
+      .style("opacity", 1);
   }, [stats, width, height]);
 
-  return (
-    <div
-      ref={containerRef}
-      style={{ position: "relative", width, height }}
-    ></div>
-  );
+  return <svg ref={svgRef}></svg>;
 }
+

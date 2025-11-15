@@ -4,7 +4,6 @@ import React, { useMemo, useEffect, useRef, useState } from "react";
 import type { PersonData } from "@/lib/types";
 import {
   VOTE_OPTION_SINGLE_COLORS,
-  VOTE_OPTION_COLORS_3BIN,
   DEFAULT_COLORS,
 } from "./ThailandMap/constants";
 
@@ -17,6 +16,7 @@ interface ProvinceVoteStats {
   absentCount: number;
   total: number;
   portion: number;
+  winningOption?: string;
 }
 
 interface MapTooltipProps {
@@ -87,6 +87,25 @@ export default function MapTooltip({
         {/* MP Count */}
         <div className="text-xs text-gray-600 mb-2">
           จำนวน ส.ส.: <span className="font-semibold">{mps.length}</span> คน
+          {!selectedVoteOption && voteStats?.winningOption && (
+            <>
+              <br />
+              <span className="text-xs text-gray-500">
+                ผลโหวตที่ชนะ:{" "}
+                <span
+                  className="font-semibold"
+                  style={{
+                    color:
+                      VOTE_OPTION_SINGLE_COLORS[
+                        voteStats.winningOption as keyof typeof VOTE_OPTION_SINGLE_COLORS
+                      ] || DEFAULT_COLORS.GRAY_700,
+                  }}
+                >
+                  {voteStats.winningOption}
+                </span>
+              </span>
+            </>
+          )}
         </div>
 
         {/* Vote Statistics */}
@@ -99,19 +118,7 @@ export default function MapTooltip({
                   สัดส่วนการใช้สิทธิ:
                 </div>
                 <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{
-                      backgroundColor: VOTE_OPTION_COLORS_3BIN
-                        .ทั้งหมด[0] as string,
-                    }}
-                  ></div>
-                  <span
-                    className="text-lg font-bold"
-                    style={{
-                      color: VOTE_OPTION_COLORS_3BIN.ทั้งหมด[0] as string,
-                    }}
-                  >
+                  <span className="text-lg font-bold">
                     {(voteStats.portion * 100).toFixed(2)}%
                   </span>
                 </div>

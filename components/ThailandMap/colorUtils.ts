@@ -1,5 +1,5 @@
 import type { ProvinceVoteStats } from "./types";
-import { VOTE_OPTION_SINGLE_COLORS, DEFAULT_COLORS } from "./constants";
+import { VOTE_OPTION_GRADIENT_COLORS, DEFAULT_COLORS } from "./constants";
 
 /**
  * Interpolates between two colors based on a factor (0-1)
@@ -34,15 +34,18 @@ function interpolateColor(
 
 /**
  * Gets gradient color based on portion value (0-1)
- * Interpolates from light (#f5f5f5) to the full color
+ * Interpolates from light color to dark color based on the gradient range
  */
-function getGradientColor(baseColor: string, portion: number): string {
+function getGradientColor(
+  voteOption: keyof typeof VOTE_OPTION_GRADIENT_COLORS,
+  portion: number
+): string {
   if (portion <= 0) return DEFAULT_COLORS.NO_DATA;
 
-  const lightColor = "#f5f5f5"; // Very light gray as base
   const clampedPortion = Math.min(Math.max(portion, 0), 1);
+  const [lightColor, darkColor] = VOTE_OPTION_GRADIENT_COLORS[voteOption];
 
-  return interpolateColor(lightColor, baseColor, clampedPortion);
+  return interpolateColor(lightColor, darkColor, clampedPortion);
 }
 
 /**
@@ -67,17 +70,15 @@ export function getProvinceHeatmapColor(
 
     // Use winning option color
     const winningOption = stats.winningOption || "ทั้งหมด";
-    const baseColor =
-      VOTE_OPTION_SINGLE_COLORS[
-        winningOption as keyof typeof VOTE_OPTION_SINGLE_COLORS
-      ];
+    const gradientOption =
+      winningOption as keyof typeof VOTE_OPTION_GRADIENT_COLORS;
 
-    if (!baseColor) {
-      // Fallback to gray if winning option not found
-      return getGradientColor("#9ca3af", stats.portion);
+    if (!VOTE_OPTION_GRADIENT_COLORS[gradientOption]) {
+      // Fallback to gray gradient if winning option not found
+      return interpolateColor("#9ca3af", "#4b5563", stats.portion);
     }
 
-    return getGradientColor(baseColor, stats.portion);
+    return getGradientColor(gradientOption, stats.portion);
   }
 
   // Specific option selected
@@ -92,8 +93,7 @@ export function getProvinceHeatmapColor(
 
   if (portionValue <= 0) return DEFAULT_COLORS.NO_DATA;
 
-  const baseColor = VOTE_OPTION_SINGLE_COLORS[voteOption];
-  return getGradientColor(baseColor, portionValue);
+  return getGradientColor(voteOption, portionValue);
 }
 
 /**
@@ -104,10 +104,10 @@ function getVoteOptionData(
   stats: ProvinceVoteStats
 ): {
   portionValue: number;
-  voteOption: keyof typeof VOTE_OPTION_SINGLE_COLORS | null;
+  voteOption: keyof typeof VOTE_OPTION_GRADIENT_COLORS | null;
 } {
   let portionValue = 0;
-  let voteOption: keyof typeof VOTE_OPTION_SINGLE_COLORS | null = null;
+  let voteOption: keyof typeof VOTE_OPTION_GRADIENT_COLORS | null = null;
 
   switch (selectedVoteOption) {
     case "เห็นด้วย":
