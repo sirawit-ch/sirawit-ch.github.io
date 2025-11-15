@@ -16,6 +16,7 @@ interface ProvinceVoteStats {
   noVoteCount: number;
   absentCount: number;
   total: number;
+  portion: number;
 }
 
 interface MapTooltipProps {
@@ -111,11 +112,7 @@ export default function MapTooltip({
                       color: VOTE_OPTION_COLORS_3BIN.ทั้งหมด[0] as string,
                     }}
                   >
-                    {(
-                      (voteStats.agreeCount + voteStats.disagreeCount) *
-                      100
-                    ).toFixed(1)}
-                    %
+                    {(voteStats.portion * 100).toFixed(2)}%
                   </span>
                 </div>
               </>
