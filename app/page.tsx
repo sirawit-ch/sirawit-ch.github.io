@@ -224,7 +224,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
         <div className="mx-auto px-8 py-4 h-full max-w-[1800px]">
-          <div className="flex gap-6">
+          <div className="h-full flex gap-6">
             {/* Filter Panel - Left */}
             <div className="w-80 shrink-0 h-full overflow-hidden">
               <Paper
@@ -233,7 +233,7 @@ export default function Home() {
                   background: "rgba(255, 255, 255, 0.95)",
                   backdropFilter: "blur(10px)",
                   borderRadius: "16px",
-                  height: "100%",
+
                   overflow: "auto",
                 }}
               >
@@ -249,7 +249,7 @@ export default function Home() {
             </div>
 
             {/* Map Section - Center */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 h-full overflow-hidden">
               <Paper
                 elevation={0}
                 sx={{
@@ -308,17 +308,19 @@ export default function Home() {
 
             {/* Info Panel - Right */}
             <div className="w-[420px] h-full overflow-hidden">
-              <InfoPanel
-                key={`${selectedProvince || "no-province"}-${
-                  selectedVoteEvent || "no-event"
-                }-${selectedVoteOption || "no-option"}`}
-                province={selectedProvince}
-                mps={selectedMPs}
-                totalMPs={people.length}
-                voteDetailData={filteredVoteDetailData}
-                allVoteDetailData={voteDetailData}
-                backgroundColor={getBackgroundColor()}
-              />
+              <div className="h-full overflow-auto">
+                <InfoPanel
+                  key={`${selectedProvince || "no-province"}-${
+                    selectedVoteEvent || "no-event"
+                  }-${selectedVoteOption || "no-option"}`}
+                  province={selectedProvince}
+                  mps={selectedMPs}
+                  totalMPs={people.length}
+                  voteDetailData={filteredVoteDetailData}
+                  allVoteDetailData={voteDetailData}
+                  backgroundColor={getBackgroundColor()}
+                />
+              </div>
             </div>
           </div>
         </div>

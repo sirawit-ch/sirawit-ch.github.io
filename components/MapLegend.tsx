@@ -145,13 +145,15 @@ export default function MapLegend({ selectedVoteOption }: MapLegendProps) {
                   fontFamily: "var(--font-sukhumvit), system-ui, sans-serif",
                   color: "text.secondary",
                   fontSize: "10px",
+                  width: "24px",
+                  flexShrink: 0,
                 }}
               >
                 0%
               </Typography>
               <Box
                 sx={{
-                  flex: 1,
+                  width: "40px",
                   height: 12,
                   borderRadius: "6px",
                   background: currentGradient
@@ -166,6 +168,9 @@ export default function MapLegend({ selectedVoteOption }: MapLegendProps) {
                   fontFamily: "var(--font-sukhumvit), system-ui, sans-serif",
                   color: "text.secondary",
                   fontSize: "10px",
+                  width: "32px",
+                  textAlign: "right",
+                  flexShrink: 0,
                 }}
               >
                 100%
