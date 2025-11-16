@@ -15,6 +15,7 @@ interface InfoPanelProps {
   voteDetailData: VoteDetailData[];
   allVoteDetailData?: VoteDetailData[];
   backgroundColor?: string;
+  selectedVoteOption?: string | null;
 }
 
 export default function InfoPanel({
@@ -24,6 +25,7 @@ export default function InfoPanel({
   voteDetailData,
   allVoteDetailData,
   backgroundColor = "#E8FBFF",
+  selectedVoteOption = null,
 }: InfoPanelProps) {
   const [selectedMP, setSelectedMP] = useState<PersonData | null>(null);
 
@@ -173,6 +175,15 @@ export default function InfoPanel({
     });
   }, [mps, voteDetailData, province, mpStats]);
 
+  // Count MPs by selected vote option
+  const mpCountByVoteOption = useMemo(() => {
+    if (!selectedVoteOption || !province) return filteredMPs.length;
+
+    return voteDetailData.filter(
+      (vote) => vote.province === province && vote.option === selectedVoteOption
+    ).length;
+  }, [voteDetailData, province, selectedVoteOption, filteredMPs.length]);
+
   // Default view - Overall statistics
   if (!province || mps.length === 0) {
     return (
@@ -254,7 +265,10 @@ export default function InfoPanel({
           {province}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          ส.ส. ทั้งหมด {filteredMPs.length} คน
+          {`ส.ส. ทั้งหมด ${filteredMPs.length} คน`}
+          {selectedVoteOption
+            ? `${selectedVoteOption} ${mpCountByVoteOption} คน`
+            : ""}
         </Typography>
       </Box>
 
@@ -444,6 +458,7 @@ export default function InfoPanel({
               >
                 <D3DonutChart
                   stats={selectedMPStats}
+                  selectedVoteOption={selectedVoteOption}
                   width={250}
                   height={200}
                 />

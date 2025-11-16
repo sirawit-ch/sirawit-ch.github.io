@@ -319,6 +319,7 @@ export default function Home() {
                   voteDetailData={filteredVoteDetailData}
                   allVoteDetailData={voteDetailData}
                   backgroundColor={getBackgroundColor()}
+                  selectedVoteOption={selectedVoteOption}
                 />
               </div>
             </div>
