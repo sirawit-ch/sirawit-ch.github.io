@@ -7,7 +7,9 @@ import type {
   GroupedPersonData,
 } from "./types";
 
-const NEW_DATA_PATH = "/data/new-data";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const DATA_PATH = process.env.NEXT_PUBLIC_DATA_PATH || '/data/new-data';
+const NEW_DATA_PATH = `${BASE_PATH}${DATA_PATH}`;
 
 /**
  * Load person data from static JSON
